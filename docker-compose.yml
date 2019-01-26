@@ -1,0 +1,75 @@
+version: '3'
+services:
+  3boxjs:
+    build:
+      context: .
+      dockerfile: Dockerfile.3boxjs
+    volumes:
+      - ./3box-js/src:/3box-js/src
+      - ./3box-js/example:/3box-js/example
+    ports:
+      - "30000:30000"
+  pinning:
+    build:
+      context: .
+      dockerfile: Dockerfile.pinning
+    volumes:
+      - ./3box-pinning-server/src:/3box-pinning-server/src
+    ports:
+      - "8081:8081"
+      - "4002:4002"
+      - "4003:4003"
+      - "5002:5002"
+      - "9090:9090"
+    environment:
+      - IPFS_PATH=/ipfs
+      - REDIS_PATH=redis
+    networks:
+      - redis-net
+    depends_on:
+      - redis
+  address:
+    build:
+      context: .
+      dockerfile: Dockerfile.address
+    volumes:
+      - ./3box-address-server/src:/3box-address-server/src
+    ports:
+      - "3001:3001"
+  graphql:
+    build:
+      context: .
+      dockerfile: Dockerfile.graphql
+    volumes:
+      - ./3box-graphql/src:/3box-graphql/src
+    ports:
+      - "3002:3002"
+  redis:
+    image: redis:4.0.5-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    hostname: redis
+    networks:
+      - redis-net
+    volumes:
+      - redis-data:/data
+
+networks:
+  redis-net:
+
+volumes:
+  redis-data:
+
+
+#   web:
+#     build: .
+#     ports:
+#     - "5000:5000"
+#     volumes:
+#     - .:/code
+#     - logvolume01:/var/log
+#     links:
+#     - redis
+#   redis:
+#     image: redis
+# volumes:
+#   logvolume01: {}

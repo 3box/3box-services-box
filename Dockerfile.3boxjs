@@ -1,0 +1,6 @@
+FROM node:10
+WORKDIR /3box-js
+COPY /3box-js /3box-js
+RUN npm install
+EXPOSE 30000
+CMD npm run example:start

@@ -1,0 +1,12 @@
+[submodule "3box-js"]
+	path = 3box-js
+	url = https://github.com/3box/3box-js
+[submodule "3box-pinning-server"]
+	path = 3box-pinning-server
+	url = https://github.com/3box/3box-pinning-server
+[submodule "3box-address-server"]
+	path = 3box-address-server
+	url = https://github.com/3box/3box-address-server
+[submodule "3box-graphql"]
+	path = 3box-graphql
+	url = https://github.com/3box/3box-graphql
