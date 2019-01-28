@@ -1,14 +1,25 @@
 version: '3'
 services:
+
   3boxjs:
     build:
       context: .
       dockerfile: Dockerfile.3boxjs
     volumes:
       - ./3box-js/src:/3box-js/src
+      - ./3box-js/webpack.config.js:/3box-js/webpack.config.js
+      - ./3box-js/webpack.dev.config.js:/3box-js/webpack.dev.config.js
+      - ./3box-js/.babelrc:/3box-js/.babelrc
       - ./3box-js/example:/3box-js/example
     ports:
       - "30000:30000"
+    environment:
+      - PINNING_NODE=/ip4/127.0.0.1/tcp/4003/ws/ipfs/QmP9WyCh3DkjFJ7Z5okG31D8aAGbJuiNUwsmU3wB7Wu2V9
+      - ADDRESS_SERVER_URL=http://127.0.0.1:3001
+      - PINNING_ROOM=3box-pinning
+      - GRAPHQL_SERVER_URL=http://127.0.0.1:3002
+      - PROFILE_SERVER_URL=http://127.0.0.1:8081
+
   pinning:
     build:
       context: .
@@ -22,20 +33,17 @@ services:
       - "5002:5002"
       - "9090:9090"
     environment:
-      - IPFS_PATH=/ipfs
+      - IPFS_PATH=./ipfs
       - REDIS_PATH=redis
+      - ADDRESS_SERVER_URL=address
+      - ORBITDB_PATH=./orbitdb
     networks:
       - redis-net
+      - pinning
+      - address-net
     depends_on:
       - redis
-  address:
-    build:
-      context: .
-      dockerfile: Dockerfile.address
-    volumes:
-      - ./3box-address-server/src:/3box-address-server/src
-    ports:
-      - "3001:3001"
+
   graphql:
     build:
       context: .
@@ -43,7 +51,14 @@ services:
     volumes:
       - ./3box-graphql/src:/3box-graphql/src
     ports:
-      - "3002:3002"
+      - 3002:3000
+    environment:
+      - PROFILE_SERVER_URL=http://pinning:8081
+    depends_on:
+      - pinning
+    networks:
+      - pinning
+
   redis:
     image: redis:4.0.5-alpine
     command: ["redis-server", "--appendonly", "yes"]
@@ -53,23 +68,41 @@ services:
     volumes:
       - redis-data:/data
 
+  address:
+    build:
+      context: .
+      dockerfile: Dockerfile.address
+    volumes:
+      - ./3box-address-server/src:/3box-address-server/src
+    ports:
+      - 3001:3000
+    environment:
+      - PGHOST=address_db
+      - PGDATABASE=mydb
+      - PGUSER=myuser
+      - PGPASSWORD=myuserpassword
+    depends_on:
+        - address_db
+    networks:
+      - address-net
+      - pinning
+
+  address_db:
+    image: postgres:10
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_USER=myuser
+      - POSTGRES_PASSWORD=myuserpassword
+      - POSTGRES_DB=mydb
+    networks:
+      - address-net
+
 networks:
   redis-net:
+  pinning:
+  address-net:
 
 volumes:
   redis-data:
-
-
-#   web:
-#     build: .
-#     ports:
-#     - "5000:5000"
-#     volumes:
-#     - .:/code
-#     - logvolume01:/var/log
-#     links:
-#     - redis
-#   redis:
-#     image: redis
-# volumes:
-#   logvolume01: {}
