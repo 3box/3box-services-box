@@ -79,7 +79,7 @@ services:
     environment:
       - PGHOST=address_db
       - PGDATABASE=mydb
-      - PGUSER=myuser
+      - PGUSER=threebox
       - PGPASSWORD=myuserpassword
     depends_on:
         - address_db
@@ -88,12 +88,14 @@ services:
       - pinning
 
   address_db:
-    image: postgres:10
+    build:
+      context: .
+      dockerfile: Dockerfile.address_db
     restart: always
     ports:
       - 5432:5432
     environment:
-      - POSTGRES_USER=myuser
+      - POSTGRES_USER=threebox
       - POSTGRES_PASSWORD=myuserpassword
       - POSTGRES_DB=mydb
     networks:
