@@ -19,6 +19,9 @@ services:
       - PINNING_ROOM=3box-pinning
       - GRAPHQL_SERVER_URL=http://127.0.0.1:3002
       - PROFILE_SERVER_URL=http://127.0.0.1:8081
+      - MUPORT_IPFS_HOST=0.0.0.0
+      - MUPORT_IPFS_PORT=5001
+      - MUPORT_IPFS_PROTOCOL=http
 
   pinning:
     build:
@@ -27,11 +30,11 @@ services:
     volumes:
       - ./3box-pinning-server/src:/3box-pinning-server/src
     ports:
-      - "8081:8081"
-      - "4002:4002"
-      - "4003:4003"
-      - "5002:5002"
-      - "9090:9090"
+      - 8081:8081
+      - 4002:4002
+      - 4003:4003
+      - 5002:5002
+      - 9090:9090
     environment:
       - IPFS_PATH=./ipfs
       - REDIS_PATH=redis
@@ -68,6 +71,11 @@ services:
       - redis-net
     volumes:
       - redis-data:/data
+
+  ipfs:
+    image: ipfs/go-ipfs
+    ports:
+      - 5001:5001
 
   address:
     build:
