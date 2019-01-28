@@ -82,7 +82,7 @@ services:
       - PGUSER=threebox
       - PGPASSWORD=myuserpassword
     depends_on:
-        - address_db
+      - address_db
     networks:
       - address-net
       - pinning
