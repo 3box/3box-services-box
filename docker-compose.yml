@@ -35,7 +35,7 @@ services:
     environment:
       - IPFS_PATH=./ipfs
       - REDIS_PATH=redis
-      - ADDRESS_SERVER_URL=address
+      - ADDRESS_SERVER_URL=http://address:3000
       - ORBITDB_PATH=./orbitdb
     networks:
       - redis-net
@@ -43,6 +43,7 @@ services:
       - address-net
     depends_on:
       - redis
+      - address
 
   graphql:
     build:
