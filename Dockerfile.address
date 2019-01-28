@@ -3,5 +3,5 @@ WORKDIR /3box-address-server
 COPY /3box-address-server /3box-address-server
 RUN npm install -g serverless
 RUN npm install
-EXPOSE 3001
-CMD serverless offline start -p 3001
+EXPOSE 3000
+CMD serverless offline start 

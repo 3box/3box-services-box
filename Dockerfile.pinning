@@ -1,6 +1,6 @@
 FROM node:10
 WORKDIR /3box-pinning-server
-COPY /3box-pinning-server /3box-pinning-server
+COPY /3box-pinning-server/package.json /3box-pinning-server/package.json
 COPY /ipfs /3box-pinning-server/ipfs
 RUN npm install
 EXPOSE  8081 4002 4003 5002 9090
