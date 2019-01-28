@@ -101,6 +101,17 @@ services:
     networks:
       - address-net
 
+  simulate:
+    build:
+      context: .
+      dockerfile: Dockerfile.simulate
+    volumes:
+      - ./simulate/src:/simulate/src
+      - ./simulate/webpack.config.js:/simulate/webpack.config.js
+      - ./simulate/dist:/simulate/dist
+    ports:
+      - "3033:3033"
+
 networks:
   redis-net:
   pinning:

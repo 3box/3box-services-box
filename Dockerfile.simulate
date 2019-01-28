@@ -1,0 +1,6 @@
+FROM node:10
+WORKDIR /simulate
+ADD /simulate/package.json /simulate/package.json
+RUN npm install
+EXPOSE 3033
+CMD npm run start
