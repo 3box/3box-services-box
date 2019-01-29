@@ -1,12 +1,12 @@
 {
-  "name": "3box-simulate",
+  "name": "3box-iframe-browser-test",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "./node_modules/.bin/webpack --config webpack.config.js --mode=development",
-    "start": "npm run build | node src/server.js"
+    "build:primary": "./node_modules/.bin/webpack --config src/webpack.config.js --mode=development",
+    "start:primary": "node src/server.js | npm run build:primary"
   },
   "author": "",
   "license": "ISC",
@@ -25,7 +25,7 @@
     "webpack-cli": "^3.1.2"
   },
   "dependencies": {
-    "@babel/runtime": "^7.3.1",
+    "3box": "^1.2.1",
     "truffle-privatekey-provider": "^1.0.0"
   }
 }

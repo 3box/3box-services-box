@@ -1,6 +1,7 @@
 FROM node:10
 WORKDIR /simulate
-ADD /simulate/package.json /simulate/package.json
+# ADD /simulate/package.json /simulate/package.json
+ADD /simulate /simulate
 RUN npm install
-EXPOSE 3033
-CMD npm run start
+EXPOSE 3022
+CMD npm run start:primary

@@ -116,10 +116,13 @@ services:
       dockerfile: Dockerfile.simulate
     volumes:
       - ./simulate/src:/simulate/src
-      - ./simulate/webpack.config.js:/simulate/webpack.config.js
-      - ./simulate/dist:/simulate/dist
     ports:
-      - "3033:3033"
+      - "3022:3022"
+
+  ganache:
+    image: trufflesuite/ganache-cli
+    ports:
+      - 8545:8545
 
 networks:
   redis-net:

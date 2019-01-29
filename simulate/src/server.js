@@ -1,7 +1,7 @@
 const express = require('express')
 const serveStatic = require('serve-static')
 const path = require('path')
-const port = 3033
+const port = 3022
 
 const app = express()
 app.use(serveStatic(path.join(__dirname), {'index': ['index.html']}))
