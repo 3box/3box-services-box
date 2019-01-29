@@ -1,43 +1,57 @@
 var PrivateKeyProvider = require("truffle-privatekey-provider");
-// const Box = require('3box')
 const Box = window.Box
-// console.log(Box)
-// console.log(Box2)
-
-
 
 const pinningServer = ' '
 const addressServer = ''
-const numProfiles = 3
+const numProfiles = 1
 let numProfilesCreate = 1
+const numAdds = 20
+let keyvals = 1
+
+const OPS = ['OPEN', 'ADD', 'CHANGE', 'LOGOUT', 'RESET']
 
 const ganacheHost = "http://localhost:8545"
 var privKeyRand = "11111111111111111111111111111111111111111111111111111111111111";
 
 const createKeyProvider = () => {
+  console.log(numProfilesCreate)
   const keynum = numProfilesCreate.toString()
-  numProfilesCreate++
+  numProfilesCreate = numProfilesCreate + 1
   console.log(keynum)
-  console.log(keynum.length)
   let keyID = keynum.length === 1 ? '0' + keynum : keynum
-  numProfilesCreate++
   const privKey  = keyID + privKeyRand
   var provider = new PrivateKeyProvider(privKey, ganacheHost)
   return provider
 }
 
+const keyval = () => {
+  console.log('setting ' + keyvals)
+  return Array(2).fill((keyvals++).toString())
+}
+
+const getBox = async (provider) =>  { //await Box.openBox(provider.address,  provider, {})
+  console.time("open Box");
+  const box =  await Box.openBox(provider.address,  provider, {})
+  console.timeEnd("open Box")
+  return box
+}
+
+// const boxArray = Array(numProfiles).fill().map(() => { getBox(createKeyProvider())})
+// Promise.all(BoxArray).then(boxes => Promise.all(boxes.map(box => Promise.All(Array(numAdds).map(() => box.public.set(...keyval())))))
+
+
 startButton.addEventListener('click', () => {
 
   const run = async () => {
-    for( let i=numProfiles; i--; ){
-      const provider = createKeyProvider()
-      console.log(provider.address)
-      const box = await Box.openBox(provider.address,  provider, {})
-      console.log(box)
-      await box.public.set('key', 'value!')
-      const value = await box.public.get('key')
-      console.log(value)
+    const boxPromiseArray = Array(numProfiles).fill().map(() => getBox(createKeyProvider()))
+    const boxes = await Promise.all(boxPromiseArray)
+    window.boxes = boxes
+    const boxAddPromiseArray = (box) => {
+      const addArray = Array(numAdds).fill().map(() => box.public.set(...keyval()))
+      return Promise.all(addArray)
     }
+    const boxesAdding = await Promise.all(boxes.map(boxAddPromiseArray))
+    console.log('All Done')
   }
 
   run()
