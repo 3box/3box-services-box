@@ -119,10 +119,12 @@ services:
     ports:
       - "3022:3022"
 
-  # ganache:
-  #   image: trufflesuite/ganache-cli
-  #   ports:
-  #     - 8545:8545
+  ganache:
+    image: trufflesuite/ganache-cli
+    ports:
+      - 8545:8545
+    logging:
+      driver: none
 
 networks:
   redis-net:
