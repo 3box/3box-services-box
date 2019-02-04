@@ -3,4 +3,4 @@ WORKDIR /3box-js
 ADD /3box-js/package.json /3box-js/package.json
 RUN npm install
 EXPOSE 30000
-CMD npm run example:start
+CMD npm run example-server:start | npm run build:dist:dev
