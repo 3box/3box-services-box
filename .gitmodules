@@ -10,3 +10,6 @@
 [submodule "3box-graphql"]
 	path = 3box-graphql
 	url = https://github.com/3box/3box-graphql
+[submodule "orbit-db"]
+	path = orbit-db
+	url = https://github.com/orbitdb/orbit-db.git
