@@ -11,6 +11,7 @@ services:
       - ./3box-js/webpack.dev.config.js:/3box-js/webpack.dev.config.js
       - ./3box-js/.babelrc:/3box-js/.babelrc
       - ./3box-js/example:/3box-js/example
+      - ./orbit-db:/3box-js/node_modules/orbit-db
     ports:
       - "30000:30000"
     environment:
@@ -29,6 +30,7 @@ services:
       dockerfile: Dockerfile.pinning
     volumes:
       - ./3box-pinning-server/src:/3box-pinning-server/src
+      - ./orbit-db:/3box-pinning-server/node_modules/orbit-db
     ports:
       - 8081:8081
       - 4002:4002
