@@ -1,0 +1,8 @@
+FROM node:10
+WORKDIR /3box-account
+ADD /3box-account/package.json /3box-account/package.json
+ADD /3box-account/package-lock.json /3box-account/package-lock.json
+ADD /3box-account/.babelrc /3box-account/.babelrc
+RUN npm install
+EXPOSE 54345
+CMD npm run example:start

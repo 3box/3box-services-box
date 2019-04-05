@@ -19,9 +19,21 @@ services:
       - PINNING_ROOM=3box-pinning
       - GRAPHQL_SERVER_URL=http://127.0.0.1:3002
       - PROFILE_SERVER_URL=http://127.0.0.1:8081
+      - ACCOUNT_FRAME_URL=http://127.0.0.1:54345
       - MUPORT_IPFS_HOST=0.0.0.0
       - MUPORT_IPFS_PORT=5001
       - MUPORT_IPFS_PROTOCOL=http
+
+  3boxaccount:
+    build:
+      context: .
+      dockerfile: Dockerfile.3boxaccount
+    volumes:
+      - ./3box-account/src:/3box-account/src
+      - ./3box-account/webpack.config.js:/3box-account/webpack.config.js
+      - ./3box-account/public:/3box-account/public
+    ports:
+      - "54345:54345"
 
   pinning:
     build:
@@ -72,6 +84,15 @@ services:
     volumes:
       - redis-data:/data
 
+  account-redis:
+    image: redis:4.0.5-alpine
+    command: ["redis-server"]
+    hostname: account-redis
+    networks:
+      - account-redis-net
+    volumes:
+      - account-redis-data:/data
+
   ipfs:
     image: ipfs/go-ipfs
     ports:
@@ -95,6 +116,21 @@ services:
     networks:
       - address-net
       - pinning
+
+  accountservice:
+    build:
+      context: .
+      dockerfile: Dockerfile.accountservice
+    volumes:
+      - ./3box-account-service/src:/3box-account-service/src
+    ports:
+        - "3003:3000"
+    environment:
+      - REDIS_HOST=account-redis
+    depends_on:
+      - account-redis
+    networks:
+      - account-redis-net
 
   address_db:
     build:
@@ -128,8 +164,10 @@ services:
 
 networks:
   redis-net:
+  account-redis-net:
   pinning:
   address-net:
 
 volumes:
   redis-data:
+  account-redis-data:

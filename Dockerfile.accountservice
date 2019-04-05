@@ -1,6 +1,6 @@
 FROM node:10
-WORKDIR /3box-address-server
-COPY /3box-address-server /3box-address-server
+WORKDIR /3box-account-service
+COPY /3box-account-service /3box-account-service
 RUN npm install -g serverless
 RUN npm install
 EXPOSE 3000
