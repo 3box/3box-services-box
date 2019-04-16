@@ -1,0 +1,7 @@
+FROM node:10
+WORKDIR /3box-verifications
+COPY /3box-verifications /3box-verifications
+RUN npm install -g serverless
+RUN npm install
+EXPOSE 3000
+CMD serverless offline start

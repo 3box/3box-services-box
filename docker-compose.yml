@@ -93,6 +93,15 @@ services:
     volumes:
       - account-redis-data:/data
 
+  verifications-redis:
+    image: redis:4.0.5-alpine
+    command: ["redis-server"]
+    hostname: verifications-redis
+    networks:
+      - verifications-redis-net
+    volumes:
+      - verifications-redis-data:/data
+
   ipfs:
     image: ipfs/go-ipfs
     ports:
@@ -124,13 +133,28 @@ services:
     volumes:
       - ./3box-account-service/src:/3box-account-service/src
     ports:
-        - "3003:3000"
+      - "3003:3000"
     environment:
       - REDIS_HOST=account-redis
     depends_on:
       - account-redis
     networks:
       - account-redis-net
+
+  verifications:
+    build:
+      context: .
+      dockerfile: Dockerfile.verifications
+    volumes:
+      - ./3box-verifications/src:/3box-verifications/src
+    ports:
+      - 3007:3000
+    environment:
+      - REDIS_HOST=verifications-redis
+    depends_on:
+      - verifications-redis
+    networks:
+      - verifications-redis-net
 
   address_db:
     build:
@@ -165,9 +189,11 @@ services:
 networks:
   redis-net:
   account-redis-net:
+  verifications-redis-net:
   pinning:
   address-net:
 
 volumes:
   redis-data:
   account-redis-data:
+  verifications-redis-data:

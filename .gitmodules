@@ -16,3 +16,6 @@
 [submodule "3box-account-service"]
 	path = 3box-account-service
 	url = https://github.com/3box/3box-account-service
+[submodule "3box-verifications"]
+	path = 3box-verifications
+	url = https://github.com/3box/3box-verifications
