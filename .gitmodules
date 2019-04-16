@@ -10,3 +10,9 @@
 [submodule "3box-graphql"]
 	path = 3box-graphql
 	url = https://github.com/3box/3box-graphql
+[submodule "3box-account"]
+	path = 3box-account
+	url = https://github.com/3box/3box-account
+[submodule "3box-account-service"]
+	path = 3box-account-service
+	url = https://github.com/3box/3box-account-service
