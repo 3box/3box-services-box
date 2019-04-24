@@ -1,0 +1,6 @@
+FROM node:10
+WORKDIR /3box-js-iframe
+ADD /3box-js-iframe/package.json /3box-js-iframe/package.json
+RUN npm install
+EXPOSE 30001
+CMD npm run example:start

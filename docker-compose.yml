@@ -22,6 +22,7 @@ services:
       - MUPORT_IPFS_HOST=0.0.0.0
       - MUPORT_IPFS_PORT=5001
       - MUPORT_IPFS_PROTOCOL=http
+      - IFRAME_STORE_URL=http://127.0.0.1:30001
 
   pinning:
     build:
@@ -125,6 +126,18 @@ services:
       - 8545:8545
     logging:
       driver: none
+
+  iframe:
+    build:
+      context: .
+      dockerfile: Dockerfile.iframe
+    volumes:
+      - ./3box-js-iframe/example:/3box-js-iframe/example
+      - ./3box-js-iframe/webpack.config.js:/3box-js-iframe/webpack.config.js
+      - ./3box-js-iframe/iframe.html:/3box-js-iframe/iframe.html
+      - ./3box-js-iframe/iframe.js:/3box-js-iframe/iframe.js
+    ports:
+      - "30001:30001"
 
 networks:
   redis-net:
