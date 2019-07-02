@@ -4,4 +4,4 @@ COPY /3box-address-server /3box-address-server
 RUN npm install -g serverless
 RUN npm install
 EXPOSE 3000
-CMD serverless offline start 
+CMD serverless offline --printOutput start

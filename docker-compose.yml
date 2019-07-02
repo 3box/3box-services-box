@@ -90,6 +90,7 @@ services:
       - PGDATABASE=mydb
       - PGUSER=threebox
       - PGPASSWORD=myuserpassword
+      - SLS_DEBUG=*
     depends_on:
       - address_db
     networks:
