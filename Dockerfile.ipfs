@@ -1,0 +1,7 @@
+FROM ipfs/go-ipfs
+
+COPY ipfs-entrypoint.sh /entrypoint.sh
+
+ENTRYPOINT ["/sbin/tini", "--", "/entrypoint.sh"]
+
+CMD ["daemon", "--migrate=true"]

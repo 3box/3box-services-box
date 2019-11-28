@@ -73,7 +73,13 @@ services:
       - redis-data:/data
 
   ipfs:
-    image: ipfs/go-ipfs
+    build:
+      context: .
+      dockerfile: Dockerfile.ipfs
+    volumes:
+      - ipfs-data:/data/ipfs
+    environment:
+      IPFS_PROFILE: test
     ports:
       - 5001:5001
 
@@ -90,6 +96,8 @@ services:
       - PGDATABASE=mydb
       - PGUSER=threebox
       - PGPASSWORD=myuserpassword
+    command:
+      - --printOutput
     depends_on:
       - address_db
     networks:
@@ -133,3 +141,4 @@ networks:
 
 volumes:
   redis-data:
+  ipfs-data:
