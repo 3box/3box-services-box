@@ -1,7 +1,14 @@
 FROM node:10
-WORKDIR /3box-address-server
-COPY /3box-address-server /3box-address-server
-RUN npm install -g serverless
-RUN npm install
+
 EXPOSE 3000
-CMD serverless offline start 
+
+WORKDIR /3box-address-server
+
+RUN npm install -g serverless
+
+COPY /3box-address-server/package.json /3box-address-server/package-lock.json ./
+RUN npm install
+
+COPY /3box-address-server/* ./
+
+ENTRYPOINT ["serverless", "offline", "start"]
