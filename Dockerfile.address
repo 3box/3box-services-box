@@ -2,6 +2,5 @@ FROM node:10
 WORKDIR /3box-address-server
 COPY /3box-address-server /3box-address-server
 RUN npm install -g serverless
-RUN npm install
 EXPOSE 3000
-CMD serverless offline --printOutput start
+CMD serverless offline start --printOutput

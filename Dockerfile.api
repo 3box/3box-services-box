@@ -1,0 +1,7 @@
+FROM node:10
+WORKDIR /3box-api
+COPY /3box-api/package.json /3box-api/package.json
+ADD /3box-api/package-lock.json /3box-api/package-lock.json
+RUN npm install
+EXPOSE 8081
+CMD npm run start:dev

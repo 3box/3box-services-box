@@ -1,0 +1,7 @@
+tunnels:
+  ipfs:
+    addr: 4003
+    proto: http
+  demo:
+    addr: 30000
+    proto: http
