@@ -1,7 +1,12 @@
 FROM node:10
-WORKDIR /simulate
-# ADD /simulate/package.json /simulate/package.json
-ADD /simulate /simulate
-RUN npm install
+
 EXPOSE 3022
+
+WORKDIR /simulate
+
+COPY simulate/package.json simulate/package-lock.json ./
+RUN npm install
+
+COPY simulate/* ./
+
 CMD npm run start:primary
