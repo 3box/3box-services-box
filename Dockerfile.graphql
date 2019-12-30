@@ -1,7 +1,0 @@
-FROM node:10
-WORKDIR /3box-graphql
-COPY /3box-graphql /3box-graphql
-RUN npm install -g serverless
-RUN npm install
-EXPOSE 3000
-CMD serverless offline start

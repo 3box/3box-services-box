@@ -1,3 +1,0 @@
-FROM postgres:latest
-ADD /3box-address-server/sql/create_links.sql /docker-entrypoint-initdb.d/
-ADD /3box-address-server/sql/create_root_store_addresses.sql /docker-entrypoint-initdb.d/

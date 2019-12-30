@@ -3,13 +3,10 @@ services:
 
   3boxjs:
     build:
-      context: .
-      dockerfile: Dockerfile.3boxjs
+      context: 3box-js
+      dockerfile: Dockerfile.example
     volumes:
-      - ./3box-js/src:/3box-js/src
-      - ./3box-js/webpack.config.js:/3box-js/webpack.config.js
-      - ./3box-js/webpack.dev.config.js:/3box-js/webpack.dev.config.js
-      - ./3box-js/.babelrc:/3box-js/.babelrc
+      - ./3box-js/src:/3box-js/src:ro
       - ./3box-js/example:/3box-js/example
     ports:
       - "30000:30000"
@@ -19,105 +16,139 @@ services:
       - PINNING_ROOM=3box-pinning
       - GRAPHQL_SERVER_URL=http://127.0.0.1:3002
       - PROFILE_SERVER_URL=http://127.0.0.1:8081
+      - RENDEZVOUS_DISABLE=1
       - MUPORT_IPFS_HOST=0.0.0.0
       - MUPORT_IPFS_PORT=5001
       - MUPORT_IPFS_PROTOCOL=http
 
   pinning:
-    build:
-      context: .
-      dockerfile: Dockerfile.pinning
+    build: 3box-pinning-server
     volumes:
-      - ./3box-pinning-server/src:/3box-pinning-server/src
+      - ./3box-pinning-server/src:/3box-pinning-server/src:ro
     ports:
-      - 8081:8081
       - 4002:4002
       - 4003:4003
       - 5002:5002
       - 9090:9090
     environment:
-      - IPFS_PATH=./ipfs
+      - IPFS_PATH=${IPFS_KEY}
+      - AWS_BUCKET_NAME=${IPFS_BUCKET_NAME}
+      - AWS_ACCESS_KEY_ID=${MINIO_ACCESS_KEY}
+      - AWS_SECRET_ACCESS_KEY=${MINIO_SECRET_KEY}
+      - AWS_S3_ENDPOINT=http://minio:9000
+      - AWS_S3_ADDRESSING_STYLE=path
+      - AWS_S3_SIGNATURE_VERSION=v4
       - REDIS_PATH=redis
+      - ORBIT_REDIS_PATH=redis_orbit
       - ADDRESS_SERVER_URL=http://address:3000
       - ORBITDB_PATH=./orbitdb
-    networks:
-      - redis-net
-      - pinning
-      - address-net
     depends_on:
       - redis
+      - redis_orbit
       - address
+      - minio
+    command:
+      - npx
+      - nodemon
+      - ./src/run.js
+
+  profile_api:
+    build: 3box-api
+    volumes:
+      - ./3box-api/src:/3box-api/src:ro
+    environment:
+      - IPFS_PATH=${IPFS_KEY}
+      - AWS_BUCKET_NAME=${IPFS_BUCKET_NAME}
+      - AWS_ACCESS_KEY_ID=${MINIO_ACCESS_KEY}
+      - AWS_SECRET_ACCESS_KEY=${MINIO_SECRET_KEY}
+      - AWS_S3_ENDPOINT=http://minio:9000
+      - AWS_S3_ADDRESSING_STYLE=path
+      - AWS_S3_SIGNATURE_VERSION=v4
+      - ADDRESS_SERVER_URL=http://address:3000
+      - REDIS_PATH=redis
+      - ORBIT_REDIS_PATH=redis_orbit
+    ports:
+      - 8081:8081
+    depends_on:
+      - redis
+      - redis_orbit
+      - address
+      - minio
+    command:
+      - npx
+      - nodemon
+      - ./src/run.js
 
   graphql:
     build:
-      context: .
-      dockerfile: Dockerfile.graphql
+      context: 3box-graphql
+      dockerfile: Dockerfile.offline
     volumes:
-      - ./3box-graphql/src:/3box-graphql/src
+      - ./3box-graphql/src:/3box-graphql/src:ro
     ports:
       - 3002:3000
     environment:
-      - PROFILE_SERVER_URL=http://pinning:8081
+      - PROFILE_SERVER_URL=http://profile_api:8081
     depends_on:
-      - pinning
-    networks:
-      - pinning
+      - profile_api
 
   redis:
-    image: redis:4.0.5-alpine
-    command: ["redis-server", "--appendonly", "yes"]
+    image: redis:4.0-alpine
     hostname: redis
-    networks:
-      - redis-net
     volumes:
       - redis-data:/data
+    command:
+      - --appendonly yes
 
-  ipfs:
-    image: ipfs/go-ipfs
-    ports:
-      - 5001:5001
+  redis_orbit:
+    image: redis:4.0-alpine
+    hostname: redis_orbit
+    volumes:
+      - redis-orbit-data:/data
+    command:
+      - --appendonly yes
+      - --notify-keyspace-events AKE
 
   address:
     build:
-      context: .
-      dockerfile: Dockerfile.address
+      context: 3box-address-server
+      dockerfile: Dockerfile.offline
     volumes:
-      - ./3box-address-server/src:/3box-address-server/src
+      - ./3box-address-server/src:/3box-address-server/src:ro
     ports:
       - 3001:3000
     environment:
-      - PGHOST=address_db
-      - PGDATABASE=mydb
-      - PGUSER=threebox
-      - PGPASSWORD=myuserpassword
+      - PG_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@address_db/${POSTGRES_DB}
+      - IPFS_PATH=${IPFS_KEY}
+      - AWS_BUCKET_NAME=${IPFS_BUCKET_NAME}
+      - AWS_ACCESS_KEY_ID=${MINIO_ACCESS_KEY}
+      - AWS_SECRET_ACCESS_KEY=${MINIO_SECRET_KEY}
+      - AWS_S3_ENDPOINT=http://minio:9000
+      - AWS_S3_ADDRESSING_STYLE=path
+      - AWS_S3_SIGNATURE_VERSION=v4
     depends_on:
       - address_db
-    networks:
-      - address-net
-      - pinning
+      - minio
 
   address_db:
-    build:
-      context: .
-      dockerfile: Dockerfile.address_db
+    image: postgres:10
     restart: always
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./3box-address-server/sql:/docker-entrypoint-initdb.d:ro
     ports:
       - 5432:5432
     environment:
-      - POSTGRES_USER=threebox
-      - POSTGRES_PASSWORD=myuserpassword
-      - POSTGRES_DB=mydb
-    networks:
-      - address-net
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_DB
 
   simulate:
-    build:
-      context: .
-      dockerfile: Dockerfile.simulate
+    build: simulate
     volumes:
       - ./simulate/src:/simulate/src
     ports:
-      - "3022:3022"
+      - 3022:3022
 
   ganache:
     image: trufflesuite/ganache-cli
@@ -126,10 +157,19 @@ services:
     logging:
       driver: none
 
-networks:
-  redis-net:
-  pinning:
-  address-net:
+  minio:
+    build:
+      context: minio
+    environment:
+      - MINIO_ACCESS_KEY
+      - MINIO_SECRET_KEY
+    ports:
+      - 9000:9000
+    command:
+      - server
+      - /data
 
 volumes:
   redis-data:
+  redis-orbit-data:
+  postgres-data:
