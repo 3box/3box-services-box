@@ -16,7 +16,7 @@ services:
       - PINNING_ROOM=3box-pinning
       - GRAPHQL_SERVER_URL=http://127.0.0.1:3002
       - PROFILE_SERVER_URL=http://127.0.0.1:8081
-      - RENDEZVOUS_DISABLE=1
+      - RENDEZVOUS_ADDRESS=/ip4/127.0.0.1/tcp/9091/ws/p2p-websocket-star/
       - MUPORT_IPFS_HOST=0.0.0.0
       - MUPORT_IPFS_PORT=5001
       - MUPORT_IPFS_PROTOCOL=http
@@ -168,6 +168,13 @@ services:
     command:
       - server
       - /data
+
+  libp2p:
+    image: docker.io/joincolony/star-signal-ws-rendezvous
+    environment:
+      - DISABLE_METRICS=1
+    ports:
+      - 9091:9090
 
 volumes:
   redis-data:
