@@ -13,7 +13,6 @@ services:
     environment:
       - PINNING_NODE=/ip4/127.0.0.1/tcp/4003/ws/ipfs/QmP9WyCh3DkjFJ7Z5okG31D8aAGbJuiNUwsmU3wB7Wu2V9
       - ADDRESS_SERVER_URL=http://127.0.0.1:3001
-      - PINNING_ROOM=3box-pinning
       - GRAPHQL_SERVER_URL=http://127.0.0.1:3002
       - PROFILE_SERVER_URL=http://127.0.0.1:8081
       - RENDEZVOUS_ADDRESS=/ip4/127.0.0.1/tcp/9091/ws/p2p-websocket-star/
@@ -38,7 +37,7 @@ services:
       - AWS_S3_ENDPOINT=http://minio:9000
       - AWS_S3_ADDRESSING_STYLE=path
       - AWS_S3_SIGNATURE_VERSION=v4
-      - REDIS_PATH=redis
+      - PUBSUB_REDIS_PATH=redis
       - ORBIT_REDIS_PATH=redis_orbit
       - ADDRESS_SERVER_URL=http://address:3000
       - ORBITDB_PATH=./orbitdb
@@ -170,7 +169,7 @@ services:
       - /data
 
   libp2p:
-    image: docker.io/joincolony/star-signal-ws-rendezvous
+    image: joincolony/star-signal-ws-rendezvous
     environment:
       - DISABLE_METRICS=1
     ports:
