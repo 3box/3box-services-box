@@ -33,16 +33,16 @@ $ docker-compose up pinning
 
 ## <a name="details"></a> Details
 
-TODO: Add ports that these service are all available at on your machine
-
 The following services are available to run here:
 
 - `pinning` - [3box-pinning-server](https://github.com/3box/3box-pinning-server) as ipfs/orbitdb pinning pinning node
-- `pinning` and `redis` (as Profile API) - 3box-pinning-server](https://github.com/3box/3box-pinning-server) as the getProfile API and redis cache.
+- `profile_api` and `redis` - [3box-api](https://github.com/3box/3box-api) as the getProfile API and redis cache.
 - `3boxjs` - [3box-js](https://github.com/3box/3box-js) example dapp, server 3boxjs dist file configure for services here
 - `graphql` - [3box-graphql](https://github.com/3box/3box-graphql) endpoint
 - `address` and `address_db` - [3box-address-server](https://github.com/3box/3box-address-server) with POSTGRES database
 - `simulate`- A WIP to run simulation tests with many 3Box instances
+- `libp2p` - An instance of the libp2p websocket star router for peer discovery
+- `minio` - An S3-compatible object store
 
 To restart just one service instead of all
 ```bash
