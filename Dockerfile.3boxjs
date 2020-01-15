@@ -1,7 +1,0 @@
-FROM node:10
-WORKDIR /3box-js
-ADD /3box-js/package.json /3box-js/package.json
-ADD /3box-js/package-lock.json /3box-js/package-lock.json
-RUN npm install
-EXPOSE 30000
-CMD npm run example-server:start | npm run build:dist:dev

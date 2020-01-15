@@ -1,7 +1,14 @@
 FROM node:10
+
 WORKDIR /simulate
-# ADD /simulate/package.json /simulate/package.json
-ADD /simulate /simulate
+
+COPY package.json package-lock.json ./
+
 RUN npm install
+
+COPY src ./src
+COPY .babelrc ./
+
 EXPOSE 3022
+
 CMD npm run start:primary
