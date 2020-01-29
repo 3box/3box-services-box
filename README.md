@@ -48,8 +48,16 @@ The pinning node includes the [3box REST API](https://github.com/3box/3box-api),
 
 1. Make sure your DID is configured in the pinning peer's whitelist in the `.env` file
 2. Start up the pinning node peer
-3. Set some data on your profile on the [3box hub](https://3box.io/)
-4. Fetch your profile form the local API with
+3. Run the example 3box-js webapp to connect to the 3box network by running
+    ```
+    cd 3box-js
+    npm i
+    npm example:start
+    ```
+4. Authenticate
+5. Wait a few seconds
+6. Set some data on your profile on the example server
+7. Fetch your profile from the local API with
     ```
     curl http://127.0.0.1:8082/profile?did=<your DID>
     ```
