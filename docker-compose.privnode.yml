@@ -1,0 +1,88 @@
+version: '3'
+services:
+
+  pinning:
+    build: 3box-pinning-server
+    volumes:
+      - ./3box-pinning-server/src:/3box-pinning-server/src:ro
+    ports:
+      - 4102:4002
+      - 4103:4003
+    environment:
+      - IPFS_PATH=data
+      - AWS_BUCKET_NAME=ipfs
+      - AWS_ACCESS_KEY_ID=${PRIVNODE_MINIO_ACCESS_KEY}
+      - AWS_SECRET_ACCESS_KEY=${PRIVNODE_MINIO_SECRET_KEY}
+      - AWS_S3_ENDPOINT=http://minio:9000
+      - AWS_S3_ADDRESSING_STYLE=path
+      - AWS_S3_SIGNATURE_VERSION=v4
+      - ORBIT_REDIS_PATH=redis_orbit
+      - ENTRIES_NUM_REDIS_PATH=redis_entries
+      - ORBITDB_PATH=./orbitdb
+      - PIN_SILENT=true
+      - PIN_WHITELIST_DIDS
+      - PIN_WHITELIST_SPACES
+      - ADDRESS_SERVER_URL=https://beta.3box.io/address-server
+      - RENDEZVOUS_ADDRESS=/dns4/p2p.3box.io/tcp/9090/wss/p2p-websocket-star/
+    depends_on:
+      - redis_orbit
+      - redis_entries
+      - minio
+    command:
+      - npx
+      - nodemon
+      - ./src/run.js
+
+  profile_api:
+    build: 3box-api
+    volumes:
+      - ./3box-api/src:/3box-api/src:ro
+    environment:
+      - IPFS_PATH=data
+      - AWS_BUCKET_NAME=ipfs
+      - AWS_ACCESS_KEY_ID=${PRIVNODE_MINIO_ACCESS_KEY}
+      - AWS_SECRET_ACCESS_KEY=${PRIVNODE_MINIO_SECRET_KEY}
+      - AWS_S3_ENDPOINT=http://minio:9000
+      - AWS_S3_ADDRESSING_STYLE=path
+      - AWS_S3_SIGNATURE_VERSION=v4
+      - ADDRESS_SERVER_URL=https://beta.3box.io/address-server
+      - ORBIT_REDIS_PATH=redis_orbit
+    ports:
+      - 8082:8081
+    depends_on:
+      - redis_orbit
+      - minio
+    command:
+      - npx
+      - nodemon
+      - ./src/run.js
+
+  redis_orbit:
+    image: redis:4.0-alpine
+    hostname: redis_orbit
+    volumes:
+      - redis-orbit-data:/data
+    command:
+      - --appendonly yes
+      - --notify-keyspace-events AKE
+
+  redis_entries:
+    image: redis:4.0-alpine
+    hostname: redis_entries
+    volumes:
+      - redis-entries-data:/data
+    command:
+      - --appendonly yes
+
+  minio:
+    image: minio/minio:RELEASE.2019-12-30T05-45-39Z
+    environment:
+      - MINIO_ACCESS_KEY=${PRIVNODE_MINIO_ACCESS_KEY}
+      - MINIO_SECRET_KEY=${PRIVNODE_MINIO_SECRET_KEY}
+    command:
+      - server
+      - /data
+
+volumes:
+  redis-orbit-data:
+  redis-entries-data:
