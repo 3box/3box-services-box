@@ -20,6 +20,50 @@ $ git clone --recurse-submodules https://github.com/3box/3box-services-box.git
 $ cd 3box-services-box
 ```
 
+### Running a pinning node peer
+
+A personal pinning node peer can be added to the 3box network by running the services in this repo. This pinning node will handle all (or a subset of, if desired) pinning requests sent to the 3box network.
+
+Update the `.env` file in the root of this repo, under the "Personal Node" section:
+`PIN_WHITELIST_DIDS`: An optional comma-separated (no whitespaces) list of root DIDs to be pinned when requsted
+`PIN_WHITELIST_SPACES`: An optional comma-separated (no whitespaces) list of space names to be pinned when requested
+
+For space, these parameters are used together such that both must be matched to be pinned - a space will only be pinned if its name is in the whitelist and its owner has a root DID in the whitelist.
+
+For both of these parameters, if left blank, all DIDs/spaces will be pinned.
+
+The other two entries in this section of the `.env` file set the authentication for minio, the object store container. These can be updated if desired, but the minio container is not exposed by default.
+
+
+Start the pinning node peer:
+```
+docker-compose -p privnode -f docker-compose.privnode.yml up --build
+```
+
+(Here, a unique project name is set with the `-p` parameter so as to not conflict with the services box)
+
+#### Trying out the pinning node peer
+
+The pinning node includes the [3box REST API](https://github.com/3box/3box-api), which is served locally at `http://127.0.0.1:8082`. This can be used to fetch data that has been pinned to the peer. For example, to store a copy of your profile on your local machine, and then verify it through the API:
+
+1. Make sure your DID is configured in the pinning peer's whitelist in the `.env` file
+2. Start up the pinning node peer
+3. Run the example 3box-js webapp to connect to the 3box network by running
+    ```
+    cd 3box-js
+    npm i
+    npm example:start
+    ```
+4. Authenticate
+5. Wait a few seconds
+6. Set some data on your profile on the example server
+7. Fetch your profile from the local API with
+    ```
+    curl http://127.0.0.1:8082/profile?did=<your DID>
+    ```
+
+### Running the 3box network locally
+
 Start all services:
 ```bash
 $ docker-compose up

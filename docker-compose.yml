@@ -39,11 +39,13 @@ services:
       - AWS_S3_SIGNATURE_VERSION=v4
       - PUBSUB_REDIS_PATH=redis
       - ORBIT_REDIS_PATH=redis_orbit
+      - ENTRIES_NUM_REDIS_PATH=redis_entries
       - ADDRESS_SERVER_URL=http://address:3000
       - ORBITDB_PATH=./orbitdb
     depends_on:
       - redis
       - redis_orbit
+      - redis_entries
       - address
       - minio
     command:
@@ -107,6 +109,14 @@ services:
     command:
       - --appendonly yes
       - --notify-keyspace-events AKE
+
+  redis_entries:
+    image: redis:4.0-alpine
+    hostname: redis_entries
+    volumes:
+      - redis-entries-data:/data
+    command:
+      - --appendonly yes
 
   address:
     build:
@@ -178,4 +188,5 @@ services:
 volumes:
   redis-data:
   redis-orbit-data:
+  redis-entries-data:
   postgres-data:
