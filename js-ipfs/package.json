@@ -19,5 +19,8 @@
     "libp2p-tcp": "^0.14.3",
     "libp2p-webrtc-star": "^0.17.6",
     "libp2p-websockets": "^0.13.3"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.2"
   }
 }

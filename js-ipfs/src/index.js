@@ -6,6 +6,10 @@ const Daemon = require('./daemon')
 
 const IPFS_PATH = process.env.IPFS_PATH
 
+const NODE_ID = process.env.NODE_ID
+
+const PINNING_ROOM = process.env.PINNING_ROOM || '3box-pinning'
+
 const AWS_BUCKET_NAME = process.env.AWS_BUCKET_NAME
 const AWS_ACCESS_KEY_ID = process.env.AWS_ACCESS_KEY_ID
 const AWS_SECRET_ACCESS_KEY = process.env.AWS_SECRET_ACCESS_KEY
@@ -21,6 +25,7 @@ function prepareIPFSConfig () {
     }
 
     repo = ipfsRepo({
+      nodeId: NODE_ID,
       path: IPFS_PATH,
       bucket: AWS_BUCKET_NAME,
       accessKeyId: AWS_ACCESS_KEY_ID,
@@ -34,8 +39,8 @@ function prepareIPFSConfig () {
   }
 
   let swarmAddresses = [
-    '/ip4/0.0.0.0/tcp/4002',
-    '/ip4/127.0.0.1/tcp/4003/ws'
+    `/ip4/0.0.0.0/tcp/4${NODE_ID - 1}02`,
+    `/ip4/127.0.0.1/tcp/4${NODE_ID - 1}03/ws`,
   ]
   if (process.env.RENDEZVOUS_ADDRESS) {
     swarmAddresses = [...swarmAddresses, process.env.RENDEZVOUS_ADDRESS]
@@ -51,7 +56,8 @@ function prepareIPFSConfig () {
         API: '/ip4/0.0.0.0/tcp/5002',
         Gateway: '/ip4/0.0.0.0/tcp/9090'
       }
-    }
+    },
+    pass: '12345678901234567890',
   }
 
   return ipfsOpts
@@ -60,7 +66,13 @@ function prepareIPFSConfig () {
 async function start () {
   const ipfsConfig = prepareIPFSConfig()
   daemon = new Daemon(ipfsConfig)
-  return daemon.start()
+  await daemon.start()
+  daemon._ipfs.pubsub.subscribe(PINNING_ROOM, () => undefined)
+  
+  process.on('SIGTERM', async () => {
+    await daemon._ipfs.pubsub.unsubscribe(PINNING_ROOM)
+    await daemon.stop()
+  })
 }
 
 start()

@@ -15,29 +15,15 @@ services:
       - ADDRESS_SERVER_URL=http://127.0.0.1:3001
       - GRAPHQL_SERVER_URL=http://127.0.0.1:3002
       - PROFILE_SERVER_URL=http://127.0.0.1:8081
-      - RENDEZVOUS_ADDRESS=/ip4/127.0.0.1/tcp/9091/ws/p2p-websocket-star/
-      - MUPORT_IPFS_HOST=0.0.0.0
-      - MUPORT_IPFS_PORT=5001
-      - MUPORT_IPFS_PROTOCOL=http
+      - RENDEZVOUS_ADDRESS=/dns4/host.docker.internal/tcp/9091/ws/p2p-websocket-star/
 
-  pinning:
+  pinning1:
     build: 3box-pinning-server
     volumes:
       - ./3box-pinning-server/src:/3box-pinning-server/src:ro
-    ports:
-      - 4002:4002
-      - 4003:4003
-      - 5002:5002
-      - 9090:9090
+      - ./3box-pinning-server/node_modules/ipfs-http-client:/3box-pinning-server/node_modules/ipfs-http-client:ro
     environment:
-      - IPFS_PATH=${IPFS_KEY}
-      - AWS_BUCKET_NAME=${IPFS_BUCKET_NAME}
-      - AWS_ACCESS_KEY_ID=${MINIO_ACCESS_KEY}
-      - AWS_SECRET_ACCESS_KEY=${MINIO_SECRET_KEY}
-      - AWS_S3_ENDPOINT=http://minio:9000
-      - AWS_S3_ADDRESSING_STYLE=path
-      - AWS_S3_SIGNATURE_VERSION=v4
-      - PUBSUB_REDIS_PATH=redis
+      - IPFS_API_URL=http://ipfs2:5002
       - ORBIT_REDIS_PATH=redis_orbit
       - ENTRIES_NUM_REDIS_PATH=redis_entries
       - ADDRESS_SERVER_URL=http://address:3000
@@ -47,11 +33,90 @@ services:
       - redis_orbit
       - redis_entries
       - address
+      - ipfs1
+    command:
+      - npx
+      - nodemon
+      - ./src/index.js
+
+  pinning2:
+    build: 3box-pinning-server
+    volumes:
+      - ./3box-pinning-server/src:/3box-pinning-server/src:ro
+    environment:
+      - IPFS_API_URL=http://ipfs2:5002
+      - ORBIT_REDIS_PATH=redis_orbit
+      - ENTRIES_NUM_REDIS_PATH=redis_entries
+      - ADDRESS_SERVER_URL=http://address:3000
+      - ORBITDB_PATH=./orbitdb
+    depends_on:
+      - redis
+      - redis_orbit
+      - redis_entries
+      - address
+      - ipfs2
+    command:
+      - npx
+      - nodemon
+      - ./src/index.js
+
+  ipfs_lb:
+    image: nginx
+    volumes:
+      - ./loadbalancer/nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - 5002:5002
+    depends_on:
+      - ipfs1
+      - ipfs2
+
+  ipfs1:
+    build: js-ipfs
+    volumes:
+      - ./js-ipfs/src:/js-ipfs/src:ro
+    ports:
+      - 4003:4003
+    environment:
+      - IPFS_PATH=${IPFS_KEY}
+      - AWS_BUCKET_NAME=${IPFS_BUCKET_NAME}
+      - AWS_ACCESS_KEY_ID=${MINIO_ACCESS_KEY}
+      - AWS_SECRET_ACCESS_KEY=${MINIO_SECRET_KEY}
+      - AWS_S3_ENDPOINT=http://minio:9000
+      - AWS_S3_ADDRESSING_STYLE=path
+      - AWS_S3_SIGNATURE_VERSION=v4
+      - NODE_ID=1
+      - RENDEZVOUS_ADDRESS=/dns4/host.docker.internal/tcp/9091/ws/p2p-websocket-star/
+      # - DEBUG=ipfs:http-api*
+    depends_on:
       - minio
     command:
       - npx
       - nodemon
-      - ./src/run.js
+      - ./src/index.js
+
+  ipfs2:
+    build: js-ipfs
+    volumes:
+      - ./js-ipfs/src:/js-ipfs/src:ro
+    ports:
+      - 4103:4103
+    environment:
+      - IPFS_PATH=${IPFS_KEY}
+      - AWS_BUCKET_NAME=${IPFS_BUCKET_NAME}
+      - AWS_ACCESS_KEY_ID=${MINIO_ACCESS_KEY}
+      - AWS_SECRET_ACCESS_KEY=${MINIO_SECRET_KEY}
+      - AWS_S3_ENDPOINT=http://minio:9000
+      - AWS_S3_ADDRESSING_STYLE=path
+      - AWS_S3_SIGNATURE_VERSION=v4
+      - NODE_ID=2
+      - RENDEZVOUS_ADDRESS=/dns4/host.docker.internal/tcp/9091/ws/p2p-websocket-star/
+      # - DEBUG=ipfs:http-api*
+    depends_on:
+      - minio
+    command:
+      - npx
+      - nodemon
+      - ./src/index.js
 
   profile_api:
     build: 3box-api
@@ -152,23 +217,10 @@ services:
       - POSTGRES_PASSWORD
       - POSTGRES_DB
 
-  simulate:
-    build: simulate
-    volumes:
-      - ./simulate/src:/simulate/src
-    ports:
-      - 3022:3022
-
-  ganache:
-    image: trufflesuite/ganache-cli
-    ports:
-      - 8545:8545
-    logging:
-      driver: none
-
   minio:
     build:
       context: minio
+      dockerfile: Dockerfile.split-keystore
     environment:
       - MINIO_ACCESS_KEY
       - MINIO_SECRET_KEY
