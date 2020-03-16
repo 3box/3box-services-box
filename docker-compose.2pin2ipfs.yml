@@ -44,7 +44,7 @@ services:
     volumes:
       - ./3box-pinning-server/src:/3box-pinning-server/src:ro
     environment:
-      - IPFS_API_URL=http://ipfs2:5002
+      - IPFS_API_URL=http://ipfs_lb:5002
       - ORBIT_REDIS_PATH=redis_orbit
       - ENTRIES_NUM_REDIS_PATH=redis_entries
       - ADDRESS_SERVER_URL=http://address:3000

@@ -3,6 +3,7 @@
 'use strict'
 
 const debug = require('debug')
+const querystring = require('querystring')
 
 const IPFS = require('ipfs')
 const HttpApi = require('ipfs/src/http')
@@ -68,6 +69,23 @@ class Daemon {
     // for the CLI to know the where abouts of the API
     if (this._httpApi._apiServers.length) {
       await ipfs._repo.apiAddr.set(this._httpApi._apiServers[0].info.ma)
+      this._httpApi._apiServers.forEach((server) => {
+        //server.events.on({ name: 'request'}, console.log)
+        server.ext('onRequest', (request, h, err) => {
+          try {
+            const path = request.url.pathname
+            const from = request.info.remoteAddress
+            const params = Object.assign({}, querystring.parse(request.url.search.slice(1)))
+            const httpVersion = request.httpVersion
+            if (path !== '/api/v0/pubsub/peers') {
+              console.log('onRequest', { httpVersion, path, from, params, query: request.url.search })
+            }
+          } catch(e) {
+            console.error({e})
+          }
+          return h.continue
+        })
+      })
     }
 
     this._log('started')

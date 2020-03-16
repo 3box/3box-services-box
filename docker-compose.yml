@@ -29,6 +29,7 @@ services:
       - 4003:4003
       - 5002:5002
       - 9090:9090
+      - 8181:8081
     environment:
       - IPFS_PATH=${IPFS_KEY}
       - AWS_BUCKET_NAME=${IPFS_BUCKET_NAME}
@@ -42,6 +43,8 @@ services:
       - ENTRIES_NUM_REDIS_PATH=redis_entries
       - ADDRESS_SERVER_URL=http://address:3000
       - ORBITDB_PATH=./orbitdb
+      # - NODE_ENV=local
+      # - IPFS_MONITORING=1
     depends_on:
       - redis
       - redis_orbit
