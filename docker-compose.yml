@@ -16,9 +16,6 @@ services:
       - GRAPHQL_SERVER_URL=http://127.0.0.1:3002
       - PROFILE_SERVER_URL=http://127.0.0.1:8081
       - RENDEZVOUS_ADDRESS=/ip4/127.0.0.1/tcp/9091/ws/p2p-websocket-star/
-      - MUPORT_IPFS_HOST=0.0.0.0
-      - MUPORT_IPFS_PORT=5001
-      - MUPORT_IPFS_PROTOCOL=http
 
   pinning:
     build: 3box-pinning-server
@@ -98,6 +95,8 @@ services:
     hostname: redis
     volumes:
       - redis-data:/data
+    ports:
+      - 6379:6379
     command:
       - --appendonly yes
 
@@ -106,6 +105,8 @@ services:
     hostname: redis_orbit
     volumes:
       - redis-orbit-data:/data
+    ports:
+      - 6380:6379
     command:
       - --appendonly yes
       - --notify-keyspace-events AKE
@@ -115,6 +116,8 @@ services:
     hostname: redis_entries
     volumes:
       - redis-entries-data:/data
+    ports:
+      - 6381:6379
     command:
       - --appendonly yes
 
