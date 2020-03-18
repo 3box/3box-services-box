@@ -101,6 +101,8 @@ services:
     hostname: redis
     volumes:
       - redis-data:/data
+    ports:
+      - 6379:6379
     command:
       - --appendonly yes
 
@@ -109,6 +111,8 @@ services:
     hostname: redis_orbit
     volumes:
       - redis-orbit-data:/data
+    ports:
+      - 6380:6379
     command:
       - --appendonly yes
       - --notify-keyspace-events AKE
@@ -118,6 +122,8 @@ services:
     hostname: redis_entries
     volumes:
       - redis-entries-data:/data
+    ports:
+      - 6381:6379
     command:
       - --appendonly yes
 

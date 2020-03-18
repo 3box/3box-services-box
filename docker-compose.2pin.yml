@@ -21,7 +21,7 @@ services:
     build: 3box-pinning-server
     volumes:
       - ./3box-pinning-server/src:/3box-pinning-server/src:ro
-      - ./3box-pinning-server/node_modules/ipfs-http-client:/3box-pinning-server/node_modules/ipfs-http-client:ro
+      #- ./3box-pinning-server/node_modules/ipfs-http-client:/3box-pinning-server/node_modules/ipfs-http-client:ro
     ports:
       - 4003:4003
     environment:
@@ -49,6 +49,12 @@ services:
       - npx
       - nodemon
       - ./src/index.js
+    # logging:
+    #   driver: syslog
+    #   options:
+    #     syslog-address: tcp://localhost:5000
+    #     syslog-facility: daemon
+    #     syslog-format: rfc5424micro
 
   pinning2:
     build: 3box-pinning-server
@@ -81,6 +87,12 @@ services:
       - npx
       - nodemon
       - ./src/index.js
+    # logging:
+    #   driver: syslog
+    #   options:
+    #     syslog-address: tcp://localhost:5000
+    #     syslog-facility: daemon
+    #     syslog-format: rfc5424micro
 
   profile_api:
     build: 3box-api
