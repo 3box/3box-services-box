@@ -43,7 +43,7 @@ services:
       - ENTRIES_NUM_REDIS_PATH=redis_entries
       - ADDRESS_SERVER_URL=http://address:3000
       - ORBITDB_PATH=./orbitdb
-      # - NODE_ENV=local
+      - NODE_ENV=local
       # - IPFS_MONITORING=1
     depends_on:
       - redis
@@ -161,19 +161,19 @@ services:
       - POSTGRES_PASSWORD
       - POSTGRES_DB
 
-  simulate:
-    build: simulate
-    volumes:
-      - ./simulate/src:/simulate/src
-    ports:
-      - 3022:3022
-
-  ganache:
-    image: trufflesuite/ganache-cli
-    ports:
-      - 8545:8545
-    logging:
-      driver: none
+#  simulate:
+#    build: simulate
+#    volumes:
+#      - ./simulate/src:/simulate/src
+#    ports:
+#      - 3022:3022
+#
+#  ganache:
+#    image: trufflesuite/ganache-cli
+#    ports:
+#      - 8545:8545
+#    logging:
+#      driver: none
 
   minio:
     build:
