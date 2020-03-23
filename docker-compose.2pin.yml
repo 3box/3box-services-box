@@ -39,6 +39,7 @@ services:
       - ORBITDB_PATH=./orbitdb
       - NODE_ID=1
       - RENDEZVOUS_ADDRESS=/dns4/host.docker.internal/tcp/9091/ws/p2p-websocket-star/
+      - NODE_ENV=local
     depends_on:
       - redis
       - redis_orbit
@@ -77,6 +78,7 @@ services:
       - ORBITDB_PATH=./orbitdb
       - NODE_ID=2
       - RENDEZVOUS_ADDRESS=/dns4/host.docker.internal/tcp/9091/ws/p2p-websocket-star/
+      - NODE_ENV=local
     depends_on:
       - redis
       - redis_orbit
@@ -93,6 +95,7 @@ services:
     #     syslog-address: tcp://localhost:5000
     #     syslog-facility: daemon
     #     syslog-format: rfc5424micro
+
 
   profile_api:
     build: 3box-api
@@ -139,6 +142,8 @@ services:
     hostname: redis
     volumes:
       - redis-data:/data
+    ports:
+      - 6379:6379
     command:
       - --appendonly yes
 
@@ -147,6 +152,8 @@ services:
     hostname: redis_orbit
     volumes:
       - redis-orbit-data:/data
+    ports:
+      - 6380:6379
     command:
       - --appendonly yes
       - --notify-keyspace-events AKE
@@ -156,6 +163,8 @@ services:
     hostname: redis_entries
     volumes:
       - redis-entries-data:/data
+    ports:
+      - 6381:6379
     command:
       - --appendonly yes
 
