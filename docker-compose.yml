@@ -44,6 +44,7 @@ services:
       - ADDRESS_SERVER_URL=http://address:3000
       - ORBITDB_PATH=./orbitdb
       - NODE_ENV=local
+      - RENDEZVOUS_ADDRESS=/dns4/host.docker.internal/tcp/9091/ws/p2p-websocket-star/
       # - IPFS_MONITORING=1
     depends_on:
       - redis
