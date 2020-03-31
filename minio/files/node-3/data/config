@@ -1,0 +1,72 @@
+{
+  "Addresses": {
+    "Swarm": [
+      "/ip4/0.0.0.0/tcp/4202",
+      "/ip4/127.0.0.1/tcp/4203/ws",
+      "/dns4/host.docker.internal/tcp/9091/ws/p2p-websocket-star/"
+    ],
+    "API": "/ip4/0.0.0.0/tcp/5002",
+    "Gateway": "/ip4/0.0.0.0/tcp/9090",
+    "Delegates": []
+  },
+  "Discovery": {
+    "MDNS": {
+      "Enabled": true,
+      "Interval": 10
+    },
+    "webRTCStar": {
+      "Enabled": true
+    }
+  },
+  "Bootstrap": [],
+  "Pubsub": {
+    "Router": "gossipsub",
+    "Enabled": true
+  },
+  "Swarm": {
+    "ConnMgr": {
+      "LowWater": 200,
+      "HighWater": 500
+    }
+  },
+  "Identity": {
+    "PeerID": "QmeitXUiE95yQqqJLjs1LjsvYoxUz1gRh5cztGKhL996nD",
+    "PrivKey": "CAASqAkwggSkAgEAAoIBAQCiMB3SMj41sHzAf6gkGcvTqw5bnc0NvzqiQi5tg4IT7MTKo6QwGH9QmFNf8xRZ1osyrgdjVtaiyTD+rUPdquV6gwLiCQ2+Utsu+DmXDlLYe4bXbfNYurHUg1SxtJJVDb5xJiPcivjEdO4JaNMRnxhTufIiKnUwrGBoSwHURoQ5ACSyjOu6R5oZy0K7SIMbCFPRh992MsC2N3xzPLydMxqVcHtaPtvc5h+aHM0n6KPEjZSt5UXdmboSctq2Pq5YNKJiwf7dL7otv1G5hcNwnIbfH3JkNUGGMrjMDA+KkUWzixW4F2nbYJYCQDneDS1Cte6551+EMmG/FlbHKRmJ6fWxAgMBAAECggEBAIRfQyeYjD+jsN4oEqKMT1iN5yUNURvkNMXTwDLvv43lk+RT1SDQDbFI8duA+N4uBeQyN6Nzb7DjBlMGNTrJTYxFO2givY3V8ECQpehM737yquZPPerwTU3GdqynVTuIASQ2XdSVtF4blWAmpwZd1CwZuq75+jXkqrbUaUTI3Qfrcfw03OYo+qahlqIu4FtpoKLvl9keKp3TG0WL2J3aYpUMCAKJ3oHJot2iEumi+OONASkYzUxaluljnEPRNyfOMKJTktoklcIqI8emgZcFukkNBmjxOKQbTUzDTgcgYC7GiHwQzRfJiFA/yeIwMY2/RqR5D53S9swjULIAz+p8oyUCgYEA1mVCt/TxJXWnRK+IWbaFMynHo+nOCwAcaLsP6kTGcSTdQcbD5uV24lJTMEydAL79l+MYGFGBlZ1Xi2a7M5/1zCCAHYVpzLfIVRrQp/brj8XnwbJiPnUfME4gMO5v5sQ41SqndVBHzYv8lGswBY32ly7A3VA6JL2ulh1SgnM2CR8CgYEAwalJpEpSrPIm2S4hi5YTkKBmAeR5tlG4WHVEDChFrq7kHQPfCZE39STiIQKIKcjGjLK1cmczB3CZvAXzMydyfY/Gk65pnrBP0NfXer0f+wO41FiOlo0sbtVqq/KbcldrODoKFDvO9UKglK7u2HMc1Jbh5Uix+Lt2MV4+yE/Dly8CgYBCoZXqtiV8DuS9ZBBsUV10WTfCqZdvs8kgg4KevGEwKNTa7HtV91rLW+qeyDDDWphV7C5A4JP1e8EJghQMJ1qs5izq/9ux1CxexsaybPso48jzWg1Oe/gFe0Jl8rS0c6d2GJuSyjCGoUsOlYGHOGe69LzcC2MGqCzqWpKaGFRi4QKBgQCTHH4Mh0j2h5xrLlfdKUwDeVUD6wNqM/nNeIcQlScZ41D1mZM8OUxAtJvyZ3H4C8SH7NlY5nwlEqw14G82VKjsKOO4G62wFk8LXmsZmcFJdTJaXEs0olk2eHhn1guveCjCtZQieqxkMxC44YoecpNcCqHfArHvOLg4GFeo4q65kQKBgAeUqRDspvMr0BCm+0BQtuUG0MAfI9bzyFTrYrDMEO4AoVgBuKaBhcoE5pCHl0Z2QeXQ53q06fb0JjaRQSSI8kPH/CHNexBC4dQ6crr3Tp/EeOKdf/A2Lg8YJMDcgLbhiNXKtBQlyTeI0uqBKXdlx5Xh3+aCuX140ZweOnnPRBrC"
+  },
+  "Keychain": {
+    "dek": {
+      "keyLength": 64,
+      "iterationCount": 10000,
+      "salt": "STDz1owbcfJXYVg4WDp3xEX2",
+      "hash": "sha2-512"
+    }
+  },
+  "datastore": {
+    "Spec": {
+      "type": "mount",
+      "mounts": [
+        {
+          "mountpoint": "/blocks",
+          "type": "measure",
+          "prefix": "flatfs.datastore",
+          "child": {
+            "type": "flatfs",
+            "path": "blocks",
+            "sync": true,
+            "shardFunc": "/repo/flatfs/shard/v1/next-to-last/2"
+          }
+        },
+        {
+          "mountpoint": "/",
+          "type": "measure",
+          "prefix": "leveldb.datastore",
+          "child": {
+            "type": "levelds",
+            "path": "datastore",
+            "compression": "none"
+          }
+        }
+      ]
+    }
+  }
+}
