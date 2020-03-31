@@ -88,7 +88,6 @@ services:
       - AWS_S3_SIGNATURE_VERSION=v4
       - NODE_ID=1
       - RENDEZVOUS_ADDRESS=/dns4/host.docker.internal/tcp/9091/ws/p2p-websocket-star/
-      # - DEBUG=ipfs:http-api*
     depends_on:
       - minio
     command:

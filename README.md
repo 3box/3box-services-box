@@ -20,6 +20,32 @@ $ git clone --recurse-submodules https://github.com/3box/3box-services-box.git
 $ cd 3box-services-box
 ```
 
+### Deployment Experiments
+
+This particular branch of the services box is where different deployment architectures can be tested out. It includes:
+- The current deployment setup in the main [`docker-compose.yml`](docker-compose.yml) file
+- Additional compose files for different container orchestrations
+- The [`dockprom`](https://github.com/stefanprodan/dockprom) repo as a submodule to run a Prometheus/Grafana monitoring stack locally
+- The [`docker-elk`](https://github.com/deviantony/docker-elk) repo as a submodule to run an ELK logging stack locally
+
+The logging/monitoring stacks should be run separately from the 3box orchestration, on their own docker networks, through their own compose files.
+
+#### Setup notes
+
+The multi-ipfs deployments rely on the rendezvous node for browser nodes to find backend ipfs nodes.
+
+TLDR: If on OS X, add the following entry to your computer's `/etc/hosts` file: `127.0.0.1 host.docker.internal`. Otherwise, keep reading...
+
+All peers finding each other through the rendezvous node must advertise on it **with the same multiaddress for the rendezvous node**. This is challenging with docker, because the browser is necessarily running on the host's network interface, while the IPFS nodes are on the docker network's interface, so they will have different IP addresses and hostnames for the rendezvous node. For Mac, this can be resolved by using the `host.docker.internal` hostname set automatically in each of the containers, but this entry must also be added to the docker host's hostname resolution (for example, in the `/etc/hosts` file). For other OSes, this will rely on alternative methods for setting a hostname to the host's ip inside a container, such as by using the `extra_hosts` attribute for each container in the compose file.
+
+#### Multiple Pinning Nodes (Distinct Keystores)
+
+This setup is described with 2 pinning nodes in [this compose file](docker-compose.2pin.yml)
+
+#### Separate IPFS/orbit Nodes, Multiple IPFS Nodes (Distinct Keystores)
+
+This setup uses pinning pubsub workers, and is described in [this compose file](docker-compose.2pin2ipfs.yml)
+
 ### Running a pinning node peer
 
 A personal pinning node peer can be added to the 3box network by running the services in this repo. This pinning node will handle all (or a subset of, if desired) pinning requests sent to the 3box network.
