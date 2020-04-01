@@ -13,3 +13,12 @@
 [submodule "3box-api"]
 	path = 3box-api
 	url = https://github.com/3box/3box-api.git
+[submodule "dockprom"]
+	path = dockprom
+	url = https://github.com/stefanprodan/dockprom.git
+[submodule "3box-functional-tests"]
+	path = 3box-functional-tests
+	url = git@github.com:3box/3box-functional-tests.git
+[submodule "docker-elk"]
+	path = docker-elk
+	url = https://github.com/deviantony/docker-elk
