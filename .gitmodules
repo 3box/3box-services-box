@@ -13,3 +13,6 @@
 [submodule "3box-api"]
 	path = 3box-api
 	url = https://github.com/3box/3box-api.git
+[submodule "js-ceramic"]
+	path = js-ceramic
+	url = git@github.com:ceramicnetwork/js-ceramic.git

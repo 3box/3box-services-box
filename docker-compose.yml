@@ -8,14 +8,42 @@ services:
     volumes:
       - ./3box-js/src:/3box-js/src:ro
       - ./3box-js/example:/3box-js/example
+      ## Important: If volume mounting js-ceramic, it needs to be bootstrapped and built locally without hoisting
+      # - ./js-ceramic/packages:/3box-js/node_modules/@ceramicnetwork:ro
     ports:
       - "30000:30000"
     environment:
       - PINNING_NODE=/ip4/127.0.0.1/tcp/4003/ws/ipfs/QmP9WyCh3DkjFJ7Z5okG31D8aAGbJuiNUwsmU3wB7Wu2V9
-      - ADDRESS_SERVER_URL=http://127.0.0.1:3001
+      - CERAMIC_IPFS_NODE=/ip4/127.0.0.1/tcp/4103/ws/ipfs/QmdeRFCwW8wPX3LnmQLZTmR4GPBg9hhRLwndTHyZfWpE1n
       - GRAPHQL_SERVER_URL=http://127.0.0.1:3002
       - PROFILE_SERVER_URL=http://127.0.0.1:8081
       - RENDEZVOUS_ADDRESS=/ip4/127.0.0.1/tcp/9091/ws/p2p-websocket-star/
+
+  ceramic:
+    build:
+      context: js-ceramic
+      dockerfile: Dockerfile.daemon
+    ports:
+      - 7007:7007
+    environment:
+      - IPFS_API_URL=http://ipfs:5002
+    depends_on:
+      - ipfs
+    command: >
+      bash -c "
+        cd packages/ceramic-cli &&
+        (sleep 5 && ./bin/ceramic.js watch /ceramic/bafyreidpxlnvr6gqscaeceicsz5tmiyxlzqebsvozjtzue2bky24esqkji &) &&
+        (sleep 5 && ./bin/ceramic.js watch /ceramic/bafyreiekd7xj4zungivvamff5pfu7vnf7xroreeaxowntjjilcfwf7d4mq &) &&
+        ./bin/ceramic.js daemon --ipfs-api $$IPFS_API_URL
+      "
+
+  ipfs:
+    build: ipfs
+    ports:
+      - 4102:4102
+      - 4103:4103
+      - 5002:5002
+      - 9090:9090
 
   pinning:
     build: 3box-pinning-server
@@ -24,8 +52,6 @@ services:
     ports:
       - 4002:4002
       - 4003:4003
-      - 5002:5002
-      - 9090:9090
     environment:
       - IPFS_PATH=${IPFS_KEY}
       - AWS_BUCKET_NAME=${IPFS_BUCKET_NAME}
@@ -37,58 +63,56 @@ services:
       - PUBSUB_REDIS_PATH=redis
       - ORBIT_REDIS_PATH=redis_orbit
       - ENTRIES_NUM_REDIS_PATH=redis_entries
-      - ADDRESS_SERVER_URL=http://address:3000
       - ORBITDB_PATH=./orbitdb
     depends_on:
       - redis
       - redis_orbit
       - redis_entries
-      - address
       - minio
     command:
       - npx
       - nodemon
       - ./src/run.js
 
-  profile_api:
-    build: 3box-api
-    volumes:
-      - ./3box-api/src:/3box-api/src:ro
-    environment:
-      - IPFS_PATH=${IPFS_KEY}
-      - AWS_BUCKET_NAME=${IPFS_BUCKET_NAME}
-      - AWS_ACCESS_KEY_ID=${MINIO_ACCESS_KEY}
-      - AWS_SECRET_ACCESS_KEY=${MINIO_SECRET_KEY}
-      - AWS_S3_ENDPOINT=http://minio:9000
-      - AWS_S3_ADDRESSING_STYLE=path
-      - AWS_S3_SIGNATURE_VERSION=v4
-      - ADDRESS_SERVER_URL=http://address:3000
-      - REDIS_PATH=redis
-      - ORBIT_REDIS_PATH=redis_orbit
-    ports:
-      - 8081:8081
-    depends_on:
-      - redis
-      - redis_orbit
-      - address
-      - minio
-    command:
-      - npx
-      - nodemon
-      - ./src/run.js
+#  profile_api:
+#    build: 3box-api
+#    volumes:
+#      - ./3box-api/src:/3box-api/src:ro
+#    environment:
+#      - IPFS_PATH=${IPFS_KEY}
+#      - AWS_BUCKET_NAME=${IPFS_BUCKET_NAME}
+#      - AWS_ACCESS_KEY_ID=${MINIO_ACCESS_KEY}
+#      - AWS_SECRET_ACCESS_KEY=${MINIO_SECRET_KEY}
+#      - AWS_S3_ENDPOINT=http://minio:9000
+#      - AWS_S3_ADDRESSING_STYLE=path
+#      - AWS_S3_SIGNATURE_VERSION=v4
+#      - ADDRESS_SERVER_URL=http://address:3000
+#      - REDIS_PATH=redis
+#      - ORBIT_REDIS_PATH=redis_orbit
+#    ports:
+#      - 8081:8081
+#    depends_on:
+#      - redis
+#      - redis_orbit
+#      - address
+#      - minio
+#    command:
+#      - npx
+#      - nodemon
+#      - ./src/run.js
 
-  graphql:
-    build:
-      context: 3box-graphql
-      dockerfile: Dockerfile.offline
-    volumes:
-      - ./3box-graphql/src:/3box-graphql/src:ro
-    ports:
-      - 3002:3000
-    environment:
-      - PROFILE_SERVER_URL=http://profile_api:8081
-    depends_on:
-      - profile_api
+#   graphql:
+#     build:
+#       context: 3box-graphql
+#       dockerfile: Dockerfile.offline
+#     volumes:
+#       - ./3box-graphql/src:/3box-graphql/src:ro
+#     ports:
+#       - 3002:3000
+#     environment:
+#       - PROFILE_SERVER_URL=http://profile_api:8081
+#     depends_on:
+#       - profile_api
 
   redis:
     image: redis:4.0-alpine
@@ -121,54 +145,6 @@ services:
     command:
       - --appendonly yes
 
-  address:
-    build:
-      context: 3box-address-server
-      dockerfile: Dockerfile.offline
-    volumes:
-      - ./3box-address-server/src:/3box-address-server/src:ro
-    ports:
-      - 3001:3000
-    environment:
-      - PG_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@address_db/${POSTGRES_DB}
-      - IPFS_PATH=${IPFS_KEY}
-      - AWS_BUCKET_NAME=${IPFS_BUCKET_NAME}
-      - AWS_ACCESS_KEY_ID=${MINIO_ACCESS_KEY}
-      - AWS_SECRET_ACCESS_KEY=${MINIO_SECRET_KEY}
-      - AWS_S3_ENDPOINT=http://minio:9000
-      - AWS_S3_ADDRESSING_STYLE=path
-      - AWS_S3_SIGNATURE_VERSION=v4
-    depends_on:
-      - address_db
-      - minio
-
-  address_db:
-    image: postgres:10
-    restart: always
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
-      - ./3box-address-server/sql:/docker-entrypoint-initdb.d:ro
-    ports:
-      - 5432:5432
-    environment:
-      - POSTGRES_USER
-      - POSTGRES_PASSWORD
-      - POSTGRES_DB
-
-  simulate:
-    build: simulate
-    volumes:
-      - ./simulate/src:/simulate/src
-    ports:
-      - 3022:3022
-
-  ganache:
-    image: trufflesuite/ganache-cli
-    ports:
-      - 8545:8545
-    logging:
-      driver: none
-
   minio:
     build:
       context: minio
@@ -192,4 +168,3 @@ volumes:
   redis-data:
   redis-orbit-data:
   redis-entries-data:
-  postgres-data:
