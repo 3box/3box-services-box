@@ -47,6 +47,7 @@ services:
 
   pinning:
     build: 3box-pinning-server
+    restart: on-failure
     volumes:
       - ./3box-pinning-server/src:/3box-pinning-server/src:ro
     ports:
