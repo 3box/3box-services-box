@@ -92,3 +92,6 @@ To restart just one service instead of all
 ```bash
 $ docker-compose restart pinning
 ```
+
+## Maintainers
+[@zachferland](https://github.com/zachferland)
