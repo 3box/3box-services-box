@@ -1,10 +1,13 @@
 #!/usr/bin/env node
 const puppeteer = require('puppeteer')
 
-const delay = (maxSeconds) => {
-  // delay for up to one minute
-  const millisecs = (Math.floor(Math.random() * maxSeconds) + 1) * 1000
-  return new Promise((resolve, reject) => { setTimeout(resolve, millisecs) })
+const delay = seconds => {
+  return new Promise((resolve, reject) => { setTimeout(resolve, seconds * 1000) })
+}
+const randDelay = (maxSeconds) => {
+  // delay for up to maxSeconds
+  const seconds = (Math.floor(Math.random() * maxSeconds) + 1)
+  return delay(seconds)
 }
 
 const randMsg = length => {
@@ -21,26 +24,35 @@ const genNameArray = num => {
   return new Array(num).fill(null).map(() => randMsg(10))
 }
 
-const startClient = async (browser, spaceName, threadName, numPosts) => {
-  await delay(20)
-  const url = `http://0.0.0.0:40000?space=${spaceName}&thread=${threadName}&numPosts=${numPosts}`
-  console.log(url)
-  const page = await browser.newPage()
-  await page.goto(url)
-  return page
+const startClient = async (browser, spaceName, threadName, numPosts, clientId) => {
+  while (1) {
+    await randDelay(20)
+    console.log(`Starting client '${clientId}' in space '${spaceName}', will post ${numPosts} posts`)
+    //const url = `http://0.0.0.0:40000?space=${spaceName}&thread=${threadName}&numPosts=${numPosts}`
+    // use file path as a workaround to get subtle crypto: https://github.com/puppeteer/puppeteer/issues/2301
+    const url = `file:///${process.cwd()}/src/index.html?space=${spaceName}&thread=${threadName}&numPosts=${numPosts}`
+    const page = await browser.newPage()
+    //page.on('console', msg => console.log('PAGE LOG:', msg.text()))
+    await page.goto(url)
+    //await randDelay(20)
+    //page.evaluate(() => window.box._ipfs.swarm.peers().then(x => x.map(y => console.log(y.peer))))
+    await delay(180) // run client for three minutes
+    await page.close()
+    console.log(`Stopped client '${clientId}'`)
+  }
 }
 
 const start = async (clients, clientsPosting, numSpaces, numPosts) => {
   console.log(clients, clientsPosting, numSpaces, numPosts)
   const browser = await puppeteer.launch({
      headless: true,
-     args: ['--no-sandbox', '--disable-setuid-sandbox']
+     args: ['--no-sandbox', '--disable-setuid-sandbox', '--secure-origin']
   })
   const spaces = genNameArray(numSpaces)
   const threads = spaces.map(name => name + '-thread')
   for (let i = 0; i < clients; i++) {
-    const numDesiredPosts = i < clientsPosting ? clientsPosting : 0
-    startClient(browser, spaces[i % spaces.length], threads[i % spaces.length], numDesiredPosts)
+    const numDesiredPosts = i < clientsPosting ? numPosts : 0
+    startClient(browser, spaces[i % spaces.length], threads[i % spaces.length], numDesiredPosts, i)
   }
 }
 

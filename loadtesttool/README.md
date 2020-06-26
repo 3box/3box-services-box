@@ -2,18 +2,13 @@
 Run multiple 3box clients simultaneously using puppeteer.
 
 ## Usage
-Install dependencies
+Install dependencies:
 ```
 $ cd loadtesttool
 $ npm ci
 ```
 
-First start the server
-```
-$ npm start
-```
-
-No you can run the tool:
+Run the tool:
 ```
 $ ./src/cli.js
 
@@ -29,5 +24,5 @@ Usage: $ cli.js [num clients] [num clients posting] [num spaces] [num thread pos
 
 
 ```
-$ ./src/cli.js 100 50 50 20
+$ ./src/cli.js 20 7 3 20
 ```

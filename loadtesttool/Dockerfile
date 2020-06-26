@@ -16,4 +16,4 @@ COPY webpack.config.js ./
 
 COPY src ./src
 
-CMD npm start & sleep 20s && ./src/cli.js 10 5 2 2
+CMD npm start & sleep 20s && ./src/cli.js 20 7 3 20
