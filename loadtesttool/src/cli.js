@@ -23,7 +23,7 @@ const genNameArray = num => {
 
 const startClient = async (browser, spaceName, threadName, numPosts) => {
   await delay(20)
-  const url = `http://localhost:40000?space=${spaceName}&thread=${threadName}&numPosts=${numPosts}`
+  const url = `http://0.0.0.0:40000?space=${spaceName}&thread=${threadName}&numPosts=${numPosts}`
   console.log(url)
   const page = await browser.newPage()
   await page.goto(url)
@@ -32,7 +32,10 @@ const startClient = async (browser, spaceName, threadName, numPosts) => {
 
 const start = async (clients, clientsPosting, numSpaces, numPosts) => {
   console.log(clients, clientsPosting, numSpaces, numPosts)
-  const browser = await puppeteer.launch()
+  const browser = await puppeteer.launch({
+     headless: true,
+     args: ['--no-sandbox', '--disable-setuid-sandbox']
+  })
   const spaces = genNameArray(numSpaces)
   const threads = spaces.map(name => name + '-thread')
   for (let i = 0; i < clients; i++) {
