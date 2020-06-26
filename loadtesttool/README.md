@@ -8,6 +8,11 @@ $ cd loadtesttool
 $ npm ci
 ```
 
+Build:
+```
+$ npm run build
+```
+
 Run the tool:
 ```
 $ ./src/cli.js
