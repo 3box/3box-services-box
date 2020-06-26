@@ -26,18 +26,19 @@ const genNameArray = num => {
 
 const startClient = async (browser, spaceName, threadName, numPosts, clientId) => {
   while (1) {
+    const context = await browser.createIncognitoBrowserContext()
     await randDelay(20)
     console.log(`Starting client '${clientId}' in space '${spaceName}', will post ${numPosts} posts`)
     //const url = `http://0.0.0.0:40000?space=${spaceName}&thread=${threadName}&numPosts=${numPosts}`
     // use file path as a workaround to get subtle crypto: https://github.com/puppeteer/puppeteer/issues/2301
     const url = `file:///${process.cwd()}/src/index.html?space=${spaceName}&thread=${threadName}&numPosts=${numPosts}`
-    const page = await browser.newPage()
+    const page = await context.newPage()
     //page.on('console', msg => console.log('PAGE LOG:', msg.text()))
     await page.goto(url)
     //await randDelay(20)
     //page.evaluate(() => window.box._ipfs.swarm.peers().then(x => x.map(y => console.log(y.peer))))
     await delay(180) // run client for three minutes
-    await page.close()
+    await context.close()
     console.log(`Stopped client '${clientId}'`)
   }
 }
