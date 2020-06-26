@@ -16,4 +16,4 @@ COPY webpack.config.js ./
 
 COPY src ./src
 
-CMD npm run build && ./src/cli.js 20 7 3 20
+CMD npm run build && ./src/cli.js 20 20 20 150
